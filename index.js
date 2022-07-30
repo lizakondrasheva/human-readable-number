@@ -1,85 +1,40 @@
-module.exports = function toReadable (value) {
-        value = Math.floor(value)
-        let result = '';
-        let ones = [
-            '',
-            'one',
-            'two',
-            'three',
-            'four',
-            'five',
-            'six',
-            'seven',
-            'eight',
-            'nine',
-            'ten',
-            'eleven',
-            'twelve',
-            'thirteen',
-            'fourteen',
-            'fifteen',
-            'sixteen',
-            'seventeen',
-            'eighteen',
-            'nineteen'
-        ]
-        let tens = [
-            '',
-            '',
-            'twenty',
-            'thirty',
-            'forty',
-            'fifty',
-            'sixty',
-            'seventy',
-            'eighty',
-            'ninety'
-        ]
+module.exports = function toReadable (number) {
+    const firstOrder = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+    const secondOrder = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+    const thirdOrder = ['twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    let numberStr = number.toString();
+    let str = '';
 
-        let numString = value.toString()
-
-        if (value < 0) throw new Error('Negative numbers are not supported.')
-
-        if (value === 0) {
-            result = 'zero';
-        }
-
-        //the case of 1 - 20
-        if (value < 20) {
-            result = ones[value]
-        }
-
-        if (numString.length === 2) {
-            result = tens[Number(numString[0])] + ' ' + ones[Number(numString[1])]
-        }
-
-        //100 and more
-        if (numString.length === 3) {
-            if (numString[1] === '0' && numString[2] === '0')
-                result = ones[Number(numString[0])] + ' hundred'
-            else
-                result = (
-                    ones[Number(numString[0])] +
-                    ' hundred and ' +
-                    toReadable(+(numString[1] + numString[2]))
-                )
-        }
-
-        if (numString.length === 4) {
-            let end = +(numString[1] + numString[2] + numString[3])
-            if (end === 0) {
-                result = ones[Number(numString[0])] + ' thousand'
+    switch(numberStr.length){
+        case 1:
+            str = firstOrder[numberStr];
+            break;
+        case 2:
+            if (numberStr-10 < 10) {
+                str = secondOrder[numberStr-10];
+            } else {
+                if (numberStr.slice(-1) === '0') {
+                    str = thirdOrder[numberStr.slice(0,1)-2];
+                } else {
+                    str = thirdOrder[numberStr.slice(0,1)-2] + ' ' + firstOrder[numberStr.slice(-1)];
+                }
             }
-            if (end < 100)
-                result = (
-                    ones[Number(numString[0])] +
-                    ' thousand and ' +
-                    toReadable(end)
-                )
-            result = (
-                ones[Number(numString[0])] + ' thousand ' + toReadable(end)
-            )
-        }
-        return result
-}
+            break;
+        case 3:
+            str = firstOrder[numberStr.slice(0,1)] + ' hundred';
+            if (numberStr.slice(1,2) === '0' && numberStr.slice(-1) !== '0') {
+                str += ' ' + firstOrder[numberStr.slice(-1)];
+            } else if (numberStr.slice(1,2) === '1') {
+                str += ' ' + secondOrder[numberStr.slice(1)-10];
+            } else if (numberStr.slice(1,2) > 1) {
+                if (numberStr.slice(-1) === '0') {
+                    str += ' ' + thirdOrder[numberStr.slice(1,2)-2];
+                } else {
+                    str += ' ' + thirdOrder[numberStr.slice(1,2)-2] + ' ' + firstOrder[numberStr.slice(-1)];
+                }
+            }
+            break;
+    }
 
+    return str;
+}
