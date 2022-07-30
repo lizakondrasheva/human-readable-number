@@ -1,27 +1,81 @@
-module.exports = function toReadable (numbe) {
-  const numberWords = {
-      0: 'zero',
-      1: 'one',
-      2: 'two',
-      3: 'three',
-      4: 'four',
-      5: 'five',
-      6: 'six',
-      7: 'seven',
-      8: 'eight',
-      9: 'nine',
-      10: 'ten',
-  }
+function convertNumberToWordsEN (value) {
+    value = Math.floor(value)
+    let ones = [
+        '',
+        'one',
+        'two',
+        'three',
+        'four',
+        'five',
+        'six',
+        'seven',
+        'eight',
+        'nine',
+        'ten',
+        'eleven',
+        'twelve',
+        'thirteen',
+        'fourteen',
+        'fifteen',
+        'sixteen',
+        'seventeen',
+        'eighteen',
+        'nineteen'
+    ]
+    let tens = [
+        '',
+        '',
+        'twenty',
+        'thirty',
+        'forty',
+        'fifty',
+        'sixty',
+        'seventy',
+        'eighty',
+        'ninety'
+    ]
 
-  function getNumberWord(number) {
-      if (numberWords.hasOwnProperty(number)) {
-          return numberWords[number]
-      } else {
-          return false
-      }
-  }
+    let numString = value.toString()
 
-  const numb = process.argv[2]
-    console.log(getNumberWord(numb))
-    console.log('hello')
+    if (value < 0) throw new Error('Negative numbers are not supported.')
+
+    if (value === 0) return 'zero'
+
+    //the case of 1 - 20
+    if (value < 20) {
+        return ones[value]
+    }
+
+    if (numString.length === 2) {
+        return tens[Number(numString[0])] + ' ' + ones[Number(numString[1])]
+    }
+
+    //100 and more
+    if (numString.length === 3) {
+        if (numString[1] === '0' && numString[2] === '0')
+            return ones[Number(numString[0])] + ' hundred'
+        else
+            return (
+                ones[Number(numString[0])] +
+                ' hundred and ' +
+                convertNumberToWordsEN(+(numString[1] + numString[2]))
+            )
+    }
+
+    if (numString.length === 4) {
+        let end = +(numString[1] + numString[2] + numString[3])
+        if (end === 0) return ones[Number(numString[0])] + ' thousand'
+        if (end < 100)
+            return (
+                ones[Number(numString[0])] +
+                ' thousand and ' +
+                convertNumberToWordsEN(end)
+            )
+        return (
+            ones[Number(numString[0])] + ' thousand ' + convertNumberToWordsEN(end)
+        )
+    }
+    return ''
 }
+
+console.log(convertNumberToWordsEN(995))
